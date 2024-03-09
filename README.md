@@ -47,7 +47,6 @@ The server will start and listen on `http://localhost:8080`. It's ready to accep
 
 To convert documents, you need to send a POST request to `http://localhost:8080/convert` with the following parameters:
 
-- `inputFormat`: The format of the documents inside the zip file (e.g., `docx`).
 - `outputFormat`: The desired output format for the documents (e.g., `markdown`).
 - `file`: The zip file containing the documents to be converted.
 
