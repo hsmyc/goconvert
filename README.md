@@ -6,18 +6,10 @@ This Go application is a simple file conversion service that runs a web server t
 
 ## Getting Started
 
-### Prerequisites
-
-To run this application, you need:
-
-- Go installed on your system.
-- `pandoc` installed on your system for document conversion.
-- Docker installed on your system.
-
 ### Installation
 
 #### Using Docker
-
+- Docker installed on your system.
 1. Pull the Docker image:
 
    ```bash
