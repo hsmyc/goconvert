@@ -54,7 +54,7 @@ To convert documents, you need to send a POST request to `http://localhost:8080/
 You can use tools like `curl` or Postman to make the request. Here's an example using `curl`:
 
 ```shell
-curl -X POST -F "inputFormat=docx" -F "outputFormat=markdown" -F "file=@path_to_your_file.zip" http://localhost:8080/convert
+curl -X POST -F "outputFormat=markdown" -F "file=@path_to_your_file.zip" http://localhost:8080/convert
 ```
 
 Replace `path_to_your_file.zip` with the actual path to your zip file.
