@@ -3,34 +3,30 @@ package process
 import (
 	"archive/zip"
 	"fmt"
-	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
 
-func converter(file *zip.File, o string, i string) error {
-	outDir := "outdir"
-	if err := os.MkdirAll(outDir, os.ModePerm); err != nil {
-		return fmt.Errorf("error creating directory %s: %v", outDir, err)
-	}
-
+func converter(file *zip.File, outputFormat string, inputFormat string, outputDir string) error {
 	fileReader, err := file.Open()
 	if err != nil {
 		return fmt.Errorf("error opening file %s: %v", file.Name, err)
 	}
 	defer fileReader.Close()
 
-	inputFileName := strings.Split(file.Name, ".")[0]
+	// Define output file name
+	inputFileName := strings.TrimSuffix(file.Name, filepath.Ext(file.Name))
+	outputFileName := fmt.Sprintf("%s.%s", inputFileName, outputFormat)
+	outputFilePath := filepath.Join(outputDir, outputFileName)
 
-	outputFileName := fmt.Sprintf("%s/%s.%s", outDir, inputFileName, o)
-
-	cmd := exec.Command("pandoc", "-t", o, "-f", i, "-o", outputFileName)
+	// Execute the conversion command
+	cmd := exec.Command("pandoc", "-t", outputFormat, "-f", inputFormat, "-o", outputFilePath)
 	cmd.Stdin = fileReader
-
 	if _, err = cmd.CombinedOutput(); err != nil {
 		return fmt.Errorf("error converting file %s: %v", file.Name, err)
 	}
 
-	fmt.Printf("Converted file %s to %s successfully.\n", file.Name, outputFileName)
+	fmt.Printf("Converted file %s to %s successfully.\n", file.Name, outputFilePath)
 	return nil
 }

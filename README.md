@@ -60,7 +60,63 @@ Replace `path_to_your_file.zip` with the actual path to your zip file.
 
 ### Server Response
 
-After processing the uploaded file, the server responds with a message indicating the success or failure of the upload and processing steps. In case of success, it returns "File uploaded and processed successfully."
+The server responds with a ZIP file containing the converted files. Users can handle the response programmatically to create a downloadable link for the ZIP file.
+
+Here is an example of how to use an HTML form to make the request and receive a downloadable ZIP file as a response:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Conversion Service</title>
+  </head>
+  <body>
+    <input
+      type="text"
+      id="outputFormat"
+      placeholder="Enter output format (e.g., pdf)"
+    />
+    <input type="file" id="file" />
+    <button id="submit">Convert</button>
+    <div id="downloadLinkContainer"></div>
+
+    <script>
+      document.getElementById("submit").addEventListener("click", async () => {
+        const formData = new FormData();
+        formData.append("file", document.getElementById("file").files[0]);
+        formData.append(
+          "outputFormat",
+          document.getElementById("outputFormat").value
+        );
+
+        try {
+          const response = await fetch("http://localhost:8080/convert", {
+            // Replace with your server URL
+            method: "POST",
+            body: formData,
+          });
+
+          if (response.ok) {
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = downloadUrl;
+            link.download = "converted.zip";
+            link.textContent = "Download Converted Files";
+            document.getElementById("downloadLinkContainer").appendChild(link);
+          } else {
+            console.error("Server error:", response.statusText);
+          }
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      });
+    </script>
+  </body>
+</html>
+```
 
 ## Implementation Details
 
@@ -77,7 +133,7 @@ The application utilizes Go's concurrency model (goroutines and wait groups) to 
 
 ### Error Handling
 
-The application includes basic error handling to respond appropriately to different failure scenarios, such as unsupported HTTP methods, file processing errors, and internal server errors.
+Detailed error handling to provide clearer error messages and ensure the server gracefully handles unsupported formats or issues during the conversion process.
 
 ## Limitations
 
@@ -89,7 +145,6 @@ The application includes basic error handling to respond appropriately to differ
 
 - Extend support for other archive formats like `rar` or `tar.gz`.
 - Support for additional document and archive formats.
-- Enhanced error handling and logging.
 - User authentication for secure file uploads.
 
 ## Conclusion

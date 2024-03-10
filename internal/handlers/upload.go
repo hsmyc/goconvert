@@ -3,6 +3,8 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"goconvert/internal/process"
 )
@@ -14,7 +16,6 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	inputFormat := r.FormValue("inputFormat")
 	outputFormat := r.FormValue("outputFormat")
 
 	err := r.ParseMultipartForm(10 << 20)
@@ -30,11 +31,27 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	err = process.ProcessZipFile(file, r.ContentLength, inputFormat, outputFormat)
+	outputDir, err := os.MkdirTemp("", "converted")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer os.RemoveAll(outputDir) // Clean up
+
+	err = process.ProcessZipFile(file, r.ContentLength, outputFormat, outputDir)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	fmt.Fprintf(w, "File uploaded and processed successfully.")
+	zipFilePath := filepath.Join(os.TempDir(), "output.zip")
+	err = process.ZipOutputDirectory(outputDir, zipFilePath)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer os.Remove(zipFilePath)
+	w.Header().Set("Content-Type", "application/zip")
+	w.Header().Set("Content-Disposition", "attachment; filename=output.zip")
+	http.ServeFile(w, r, zipFilePath)
 }

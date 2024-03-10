@@ -4,29 +4,32 @@ import (
 	"archive/zip"
 	"fmt"
 	"io"
-	"strings"
+	"path/filepath"
 	"sync"
 )
 
-func ProcessZipFile(zipFile io.ReaderAt, size int64, i string, o string) error {
+// ProcessZipFile processes each file within a zip archive for conversion.
+func ProcessZipFile(zipFile io.ReaderAt, size int64, outputFormat string, outputDir string) error {
 	zipReader, err := zip.NewReader(zipFile, size)
 	if err != nil {
 		return err
 	}
+
 	var wg sync.WaitGroup
-	for _, zipFile := range zipReader.File {
+	for _, file := range zipReader.File {
 		wg.Add(1)
 		go func(file *zip.File) {
 			defer wg.Done()
 			fmt.Printf("Processing %s\n", file.Name)
-			parts := strings.Split(file.Name, ".")
-			fileFormat := parts[len(parts)-1]
-			err := converter(file, o, fileFormat)
+
+			// Extract file format from the name
+			fileFormat := filepath.Ext(file.Name)[1:]
+			err := converter(file, outputFormat, fileFormat, outputDir)
 			if err != nil {
 				fmt.Printf("Error converting file %s: %v\n", file.Name, err)
 				return
 			}
-		}(zipFile)
+		}(file)
 	}
 	wg.Wait()
 	return nil

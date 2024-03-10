@@ -23,5 +23,7 @@ WORKDIR /root/
 
 COPY --from=builder /app/converter .
 
+EXPOSE 8080
+
 
 CMD ["./converter"]
