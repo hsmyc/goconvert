@@ -4,6 +4,10 @@
 
 This Go application is a simple file conversion service that runs a web server to accept zip files containing documents. Users can upload zip files through an HTTP POST request to a specified endpoint. The application will then process each document within the zip file, converting it from one format to another using an external tool (`pandoc`). This service is particularly useful for batch processing of document format conversions.
 
+### Concurrency
+
+The application utilizes Go's concurrency model (goroutines and wait groups) to process multiple documents within the zip file concurrently. This approach enhances performance, especially when dealing with large numbers of documents.
+
 ## Getting Started
 
 ### Installation
@@ -126,10 +130,6 @@ Here is an example of how to use an HTML form to make the request and receive a 
 - **Upload Handler**: A handler function that processes POST requests, extracting the zip file and the desired input and output formats.
 - **File Processor**: Processes each file within the uploaded zip, performing the conversion by invoking `pandoc` with the appropriate arguments.
 - **Containerization**: Encapsulated in a Docker container for easy deployment and scalability.
-
-### Concurrency
-
-The application utilizes Go's concurrency model (goroutines and wait groups) to process multiple documents within the zip file concurrently. This approach enhances performance, especially when dealing with large numbers of documents.
 
 ### Error Handling
 
