@@ -22,7 +22,6 @@ func ProcessZipFile(zipFile io.ReaderAt, size int64, outputFormat string, output
 			defer wg.Done()
 			fmt.Printf("Processing %s\n", file.Name)
 			ext := filepath.Ext(file.Name)
-			// Extract file format from the name
 			if len(ext) <= 1 { // Check if the extension is empty or only contains the period
 				fmt.Printf("No valid extension for file %s\n", file.Name)
 				return

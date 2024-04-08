@@ -9,6 +9,7 @@ import (
 )
 
 func converter(file *zip.File, outputFormat string, inputFormat string, outputDir string) error {
+	fmt.Printf("Processing %s\n", inputFormat)
 	fileReader, err := file.Open()
 	if err != nil {
 		return fmt.Errorf("error opening file %s: %v", file.Name, err)
