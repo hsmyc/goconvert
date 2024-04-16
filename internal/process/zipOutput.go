@@ -3,6 +3,7 @@ package process
 import (
 	"archive/zip"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -28,18 +29,22 @@ func ZipOutputDirectory(source, target string) error {
 		baseDir = filepath.Base(source)
 	}
 
-	filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
+	filepath.WalkDir(source, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
-		header, err := zip.FileInfoHeader(info)
+		fileInfo, err := d.Info()
+		if err != nil {
+			return err
+		}
+		header, err := zip.FileInfoHeader(fileInfo)
 		if err != nil {
 			return err
 		}
 		if baseDir != "" {
 			header.Name = filepath.Join(baseDir, strings.TrimPrefix(path, source))
 		}
-		if info.IsDir() {
+		if d.IsDir() {
 			header.Name += "/"
 		} else {
 			header.Method = zip.Deflate
@@ -48,7 +53,7 @@ func ZipOutputDirectory(source, target string) error {
 		if err != nil {
 			return err
 		}
-		if !info.IsDir() {
+		if !d.IsDir() {
 			file, err := os.Open(path)
 			if err != nil {
 				return err

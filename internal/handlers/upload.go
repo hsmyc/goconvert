@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -10,13 +9,10 @@ import (
 )
 
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("UploadHandler")
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-
-	outputFormat := r.FormValue("outputFormat")
 
 	err := r.ParseMultipartForm(10 << 20)
 	if err != nil {
@@ -38,7 +34,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer os.RemoveAll(outputDir) // Clean up
 
-	err = process.ProcessZipFile(file, r.ContentLength, outputFormat, outputDir)
+	err = process.ProcessZipFile(file, r.ContentLength, outputDir)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
