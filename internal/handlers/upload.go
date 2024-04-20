@@ -3,7 +3,6 @@ package handlers
 import (
 	"net/http"
 	"os"
-	"path/filepath"
 
 	"goconvert/internal/process"
 )
@@ -32,7 +31,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	defer os.RemoveAll(outputDir) // Clean up
+	defer os.RemoveAll(outputDir)
 
 	err = process.ProcessZipFile(file, r.ContentLength, outputDir)
 	if err != nil {
@@ -40,14 +39,6 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	zipFilePath := filepath.Join(os.TempDir(), "output.zip")
-	err = process.ZipOutputDirectory(outputDir, zipFilePath)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer os.Remove(zipFilePath)
-	w.Header().Set("Content-Type", "application/zip")
-	w.Header().Set("Content-Disposition", "attachment; filename=output.zip")
-	http.ServeFile(w, r, zipFilePath)
+	w.Write([]byte("File converted successfully"))
+
 }
