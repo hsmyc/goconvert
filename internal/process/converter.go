@@ -90,14 +90,45 @@ func converter(file *zip.File, inputFormat string, outputDir string) error {
 	if err != nil {
 		return fmt.Errorf("error reading converted file %s: %v", outputFileName, err)
 	}
+	// Sanitize the Markdown content
+	content := strings.ReplaceAll(string(mdContent), "\r\n", "\n")
+	replacer := strings.NewReplacer(">", "", "<", "", "^", "")
+	sanitizedContent := replacer.Replace(content)
+
+	// Extract title from the Markdown content
+	var title string
+	lines := strings.Split(sanitizedContent, "\n")
+	for _, line := range lines {
+		if strings.HasPrefix(line, "# ") {
+			title = strings.TrimPrefix(line, "# ")
+			break
+		}
+	}
+	if title == "" {
+		for _, line := range lines {
+			if strings.HasPrefix(line, "## ") {
+				title = strings.TrimPrefix(line, "## ")
+				break
+			} else if strings.HasPrefix(line, "### ") {
+				title = strings.TrimPrefix(line, "### ")
+				break
+			} else if strings.HasPrefix(line, "**") {
+				title = strings.TrimPrefix(line, "**")
+				break
+			}
+		}
+	}
+	if title == "" {
+		title = inputFileName
+	}
 
 	// Create JSON payload
 	payload := struct {
 		Title string `json:"title"`
 		Body  string `json:"body"`
 	}{
-		Title: inputFileName,
-		Body:  string(mdContent),
+		Title: title,
+		Body:  string(sanitizedContent),
 	}
 	jsonData, err := json.Marshal(payload)
 	if err != nil {
