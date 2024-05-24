@@ -3,13 +3,15 @@ package main
 import (
 	"fmt"
 	"goconvert/internal/handlers"
+	"goconvert/internal/utils"
 	"net/http"
 )
 
 func main() {
+	port := utils.GetPort()
 	http.HandleFunc("/convert", corsMiddleware(handlers.UploadHandler))
 	fmt.Println("Server started at http://localhost:8080")
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(port, nil)
 }
 
 func corsMiddleware(h http.HandlerFunc) http.HandlerFunc {

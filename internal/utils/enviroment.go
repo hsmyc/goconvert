@@ -16,3 +16,12 @@ func GetStrapi() (string, string) {
 	strapiToken := os.Getenv("STRAPI_TOKEN")
 	return strapiUrl, strapiToken
 }
+
+func GetPort() string {
+	err := godotenv.Load("../.env")
+	if err != nil {
+		fmt.Println("Error loading .env file")
+	}
+	port := os.Getenv("PORT")
+	return port
+}
