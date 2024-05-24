@@ -29,7 +29,5 @@ func GetPort() string {
 	}
 	port := os.Getenv("PORT")
 	address := ":" + port
-	fmt.Println("Port is", port)
-	fmt.Println("Address is", address)
 	return address
 }
