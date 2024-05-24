@@ -9,15 +9,13 @@ import (
 
 func main() {
 	port := utils.GetPort()
-	if port == "" {
-		port = ":8080"
-	}
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Test server is running on port %s\n", port)
 	})
 	http.HandleFunc("/convert", corsMiddleware(handlers.UploadHandler))
 	fmt.Println("Server started at http://localhost:8080")
 	http.ListenAndServe(port, nil)
+	fmt.Println("Server stopped")
 }
 
 func corsMiddleware(h http.HandlerFunc) http.HandlerFunc {

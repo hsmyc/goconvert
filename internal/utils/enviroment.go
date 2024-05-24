@@ -15,6 +15,7 @@ func GetStrapi() (string, string) {
 			fmt.Println("Error loading .env file")
 		}
 	}
+
 	strapiUrl := os.Getenv("STRAPI_URL")
 	strapiToken := os.Getenv("STRAPI_TOKEN")
 	return strapiUrl, strapiToken
@@ -26,7 +27,9 @@ func GetPort() string {
 			log.Fatal("error loading .env file:", err)
 		}
 	}
-
 	port := os.Getenv("PORT")
-	return port
+	address := ":" + port
+	fmt.Println("Port is", port)
+	fmt.Println("Address is", address)
+	return address
 }
